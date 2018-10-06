@@ -1,7 +1,8 @@
-// 3 In a Row Solver ver 2.0
+// Sudoku Solver ver 2.0
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define MAX_SIZE 81
 #define MAX_SIZE_ROOT 9
@@ -158,7 +159,19 @@ void ConstructSolution(int* from_input){
 }
 
 void Z3Solver(){
-    system("z3 formula_3.txt >> result_3.txt");
+  //printf("*** System Function Test ***\n");
+  //system("ls");
+  //system("pwd");
+  
+  //printf("***Z3 solver forking now.***\n");
+  
+  // system("z3 formula_sudoku.txt >> result_sudoku.txt");
+
+  printf("*** Exec Function Test *** \n");
+
+  //execl("/usr/local/bin/z3", "z3", "formula_sudoku.txt", ">>", "result_sudoku.txt");
+  execlp("z3", "z3", "formula_sudoku.txt", ">>", "result_sudoku.txt");
+  
 }
 
 
@@ -174,11 +187,32 @@ void LoadData(char* argument, int* data){
             if(!strcmp(box, "?") || !strcmp(box, "0")){
                 data[i] = 0;
             }
-            else if(!strcmp(box, "O")){
+            else if(!strcmp(box, "1")){
                 data[i] = 1;
             }
-            else if(!strcmp(box, "X")){
+            else if(!strcmp(box, "2")){
                 data[i] = 2;
+            }
+            else if(!strcmp(box, "3")){
+                data[i] = 3;
+            }
+            else if(!strcmp(box, "4")){
+                data[i] = 4;
+            }
+            else if(!strcmp(box, "5")){
+                data[i] = 5;
+            }
+            else if(!strcmp(box, "6")){
+                data[i] = 6;
+            }
+            else if(!strcmp(box, "7")){
+                data[i] = 7;
+            }
+            else if(!strcmp(box, "8")){
+                data[i] = 8;
+            }
+            else if(!strcmp(box, "9")){
+                data[i] = 9;
             }
             else continue;
         }
@@ -200,7 +234,7 @@ void ConvertData(int* solution){
     int index, index1, index2, dumb, value;
     line = malloc(sizeof(char)*MAX_LENGTH);
     
-    if((stream = fopen("result_3.txt", "r")) != NULL){
+    if((stream = fopen("result_sudoku.txt", "r")) != NULL){
         if((result = fgets(line, MAX_LENGTH, stream)) != NULL){
             if(!strncmp(result, "unsat", 5)){
                 printf("This game is unsatisfiable.");
@@ -238,7 +272,13 @@ void ConvertData(int* solution){
 
 void MakeOutput(int* solution){
     
-    if((stream = fopen("output_3.txt", "w")) != NULL){
+    if((stream = fopen("output_sudoku.txt", "w")) != NULL){
+        for(int i = 0; i < MAX_SIZE ; i++){
+            fprintf(stream, "%d ", solution[i]);
+            if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT - 1) fprintf(stream, "\n");
+        }
+        
+        /*
         for(int i = 0; i < MAX_SIZE ; i++){
             switch(solution[i]){
                 case 0:
@@ -250,6 +290,7 @@ void MakeOutput(int* solution){
                     continue;
             }
         }
+        */
     }
     
 }
