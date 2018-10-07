@@ -1,4 +1,4 @@
-// Sudoku ver 2.1
+// Kakurasu Solver ver 3.2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +19,7 @@ void MakeOutput(int* solution);
 void Z3Solver();
 
 void TestPrint(int* data);
+void TestOutputKaku(int* data);
 void TestOutput(int *solution);
 
 int main(int argc, char* argv[]){
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]){
         
         printf("Loading Input data. \n");
         LoadData(argv[1], data);
-        TestPrint(data);
+        TestOutputKaku(data);
         ConstructSolution(data);
         printf("\n");
         
@@ -227,10 +228,17 @@ void MakeOutput(int* solution){
 }
 
 void TestPrint(int* data){
-  for(int i = 1 ; i <= KAKU_SIZE ; i++ ){
-     printf("%d ", data[i]);
-    if(i%MAX_SIZE_ROOT == 0) printf("\n");
-  }
+    for(int i = 0 ; i < MAX_SIZE ; i++ ){
+        printf("%d) %d\n", i, data[i]);
+    }
+}
+
+void TestOutputKaku(int* data){
+    for(int i = 1 ; i <= KAKU_SIZE ; i++ ){
+        printf("%d ", data[i]);
+        if(i%MAX_SIZE_ROOT == 0) printf("\n");
+    }
+    
 }
 
 void TestOutput(int *solution){

@@ -71,7 +71,6 @@ int main(int argc, char* argv[]){
 
 void ConstructSolution(int* from_input){
   /*TODO * z3를 이용하여 fomular.txt를 생성하는 기능을 담당하는 모듈 */
-
   if((stream = fopen("formula_3.txt", "w+t")) == NULL){
     perror("Error: Formula file open failed");
   }
