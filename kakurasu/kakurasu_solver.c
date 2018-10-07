@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define KAKU_SIZE 16
 #define MAX_SIZE 64
@@ -20,45 +22,58 @@ void TestPrint(int* data);
 void TestOutput(int *solution);
 
 int main(int argc, char* argv[]){
-  int* data;
-  int* solution;
-
-  data = malloc(sizeof(int)*MAX_SIZE+1);
-  solution = malloc(sizeof(int)*MAX_SIZE+1);
-  
-  data[MAX_SIZE+1] = 0;
-  solution[MAX_SIZE+1] = 0;
-
-  printf("Loading Input data. \n");
-  LoadData(argv[1], data);
+    
+    pid_t pid;
+    int status;
+    
+    pid = fork();
+    if(pid == 0){
+        int* data;
+        data = malloc(sizeof(int)*MAX_SIZE+1);
+        data[MAX_SIZE+1] = 0;
+        
+        printf("Loading Input data. \n");
+        LoadData(argv[1], data);
+        TestPrint(data);
+        ConstructSolution(data);
+        printf("\n");
+        
+        sleep(1);
+        exit(1);
+    }
+    else if (pid < 0){
+        perror("Error: fork failed");
+    }
+    else{
+        wait(&status);
+        int* solution;
+        solution = malloc(sizeof(int)*MAX_SIZE+1);
+        solution[MAX_SIZE+1] = 0;
+        
+        Z3Solver(solution);
+        //printf("Extracting Result to output file\n");
+        ConvertData(solution);
+        //printf("Test Print for solution data --- \n");
+        //TestPrint(solution);
+        printf("Solution: \n");
+        TestOutput(solution);
+        
+        
+        MakeOutput(solution);
+        
+        
+        fclose(stream);
+        return 0;
+        
+    }
   printf("Test Print for input data --- \n");
-  TestPrint(data);
-  //TestOutput(data);
-  printf("\n");
   
-  printf("Generating Formula. \n");
-  ConstructSolution(data);
-
-  printf("Running Z3 Solver\n");
-  Z3Solver();
-
-  printf("Extracting Result to output file\n");
-  ConvertData(solution);
-  printf("Test Print for solution data --- \n");
-  //TestPrint(solution);
-  TestOutput(solution);
-  printf("\n");
-  
-  MakeOutput(solution);
-
-  fclose(stream);
-  return 0;
 }
 
 void ConstructSolution(int* from_input){
   /*TODO * z3를 이용하여 fomular.txt를 생성하는 기능을 담당하는 모듈 */
 
-  if((stream = fopen("formula_kakurasu.txt", "w")) == NULL){
+  if((stream = fopen("formula_kakurasu.txt", "w+t")) == NULL){
     perror("Error: Formula file open failed");
   }
 
@@ -121,12 +136,9 @@ void ConstructSolution(int* from_input){
 }
 
 void Z3Solver(){
-  if(system("sudo z3 -smt2 formula_kakurasu.txt >> result_kakurasu.txt")){
-    printf("System function failed to running Z3");
-  }
-  else{
-    printf("Z3 worked!");
-  }
+  
+    system("z3 formula_kakurasu.txt >> result_kakurasu.txt");
+  
 }
 
 
@@ -198,53 +210,38 @@ void ConvertData(int* solution){
 
 void MakeOutput(int* solution){
 
-  if((stream = fopen("output_kakurasu.txt", "w")) != NULL){
-      if((stream = fopen("output_kakurasu.txt", "w")) != NULL){
-      /*
-          for(int i = 0; i < MAX_SIZE ; i++){
-              fprintf(stream, "%d ", solution[i]);
-              if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT - 1) fprintf(stream, "\n");
+  if((stream = fopen("output_kakurasu.txt", "w+r")) != NULL){
+      for(int i = 0; i < MAX_SIZE ; i++){
+          if(solution[i] == 0){
+              fprintf(stream, "O ");
           }
-      */
-      /*
-    for(int i = 0; i < MAX_SIZE ; i++){
-      switch(solution[i]){
-        case 0:
-          fprintf(stream, "X ");
-          break;
-        case 1:
-          fprintf(stream, "O ");
-          break;
-        default:
-          break;
+          else{
+              fprintf(stream, "X ");
+          }
+          
+          if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT -1) fprintf(stream, "\n");
       }
-      if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT -1) fprintf(stream, "\n");  
-    */
-          for(int i = 0; i < MAX_SIZE ; i++){
-              if(solution[i] == 0){
-                  fprintf(stream, "O ");
-              }
-              else{
-                  fprintf(stream, "X ");
-              }
-              
-              if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT -1) fprintf(stream, "\n");
-          }  
-      }
-       
   }
+    
   
 }
 
 void TestPrint(int* data){
   for(int i = 1 ; i <= KAKU_SIZE ; i++ ){
-     printf("%d) %d\n", i, data[i]);
+     printf("%d ", data[i]);
+    if(i%MAX_SIZE_ROOT == 0) printf("\n");
   }
 }
 
 void TestOutput(int *solution){
   for(int i = 0; i < MAX_SIZE ; i++){
-    printf("%d ", solution[i]);
-    if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT - 1) printf("\n");
+      if(solution[i] == 0){
+          printf("O ");
+      }
+      else{
+          printf("X ");
+      }
+      
+      if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT -1) printf("\n");
   }
 }

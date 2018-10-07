@@ -1,8 +1,9 @@
-// Sudoku Solver ver 2.0
+// Sudoku Solver ver 3.1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define MAX_SIZE 81
 #define MAX_SIZE_ROOT 9
@@ -14,51 +15,62 @@ void ConstructSolution(int* data);
 void ConvertData(int* solution);
 void MakeOutput(int* solution);
 
-void Z3Solver();
+void Z3Solver(int* solution);
 
 void TestPrint(int* data);
 void TestOutput(int *solution);
 
 int main(int argc, char* argv[]){
-    int* data;
-    int* solution;
     
-    data = malloc(sizeof(int)*MAX_SIZE+1);
-    solution = malloc(sizeof(int)*MAX_SIZE+1);
+    pid_t pid;
+    int status;
     
-    data[MAX_SIZE+1] = 0;
-    solution[MAX_SIZE+1] = 0;
-    
-    printf("Loading Input data. \n");
-    LoadData(argv[1], data);
-    printf("Test Print for input data --- \n");
-    //TestPrint(data);
-    TestOutput(data);
-    printf("\n");
-    
-    printf("Generating Formula. \n");
-    ConstructSolution(data);
-    
-    printf("Running Z3 Solver\n");
-    Z3Solver();
-    
-    printf("Extracting Result to output file\n");
-    ConvertData(solution);
-    printf("Test Print for solution data --- \n");
-    //TestPrint(solution);
-    TestOutput(solution);
-    printf("\n");
-    
-    MakeOutput(solution);
-    
-    fclose(stream);
-    return 0;
+    pid = fork();
+    if(pid == 0){
+        int* data;
+        data = malloc(sizeof(int)*MAX_SIZE+1);
+        data[MAX_SIZE+1] = 0;
+        
+        printf("Loading Input data. \n");
+        LoadData(argv[1], data);
+        TestOutput(data);
+        ConstructSolution(data);
+        printf("\n");
+        
+        sleep(1);
+        exit(1);
+    }
+    else if (pid < 0){
+        perror("Error: fork failed");
+    }
+    else{
+        wait(&status);
+        int* solution;
+        solution = malloc(sizeof(int)*MAX_SIZE+1);
+        solution[MAX_SIZE+1] = 0;
+        
+        Z3Solver(solution);
+        //printf("Extracting Result to output file\n");
+        ConvertData(solution);
+        //printf("Test Print for solution data --- \n");
+        //TestPrint(solution);
+        printf("Solution: \n");
+        TestOutput(solution);
+        
+        
+        MakeOutput(solution);
+        
+        
+        fclose(stream);
+        return 0;
+        
+    }
 }
 
 void ConstructSolution(int* from_input){
     /*TODO * z3를 이용하여 fomular.txt를 생성하는 기능을 담당하는 모듈 */
     
-    if((stream = fopen("formula_sudoku.txt", "w")) == NULL){
+    if((stream = fopen("formula_sudoku.txt", "w+t")) == NULL){
         perror("Error: Formula file open failed");
     }
     int x, y ,n ;
@@ -158,20 +170,8 @@ void ConstructSolution(int* from_input){
     
 }
 
-void Z3Solver(){
-  //printf("*** System Function Test ***\n");
-  //system("ls");
-  //system("pwd");
-  
-  //printf("***Z3 solver forking now.***\n");
-  
-  // system("z3 formula_sudoku.txt >> result_sudoku.txt");
-
-  printf("*** Exec Function Test *** \n");
-
-  //execl("/usr/local/bin/z3", "z3", "formula_sudoku.txt", ">>", "result_sudoku.txt");
-  execlp("z3", "z3", "formula_sudoku.txt", ">>", "result_sudoku.txt");
-  
+void Z3Solver(int* solution){
+    system("z3 formula_sudoku.txt >> result_sudoku.txt");
 }
 
 
