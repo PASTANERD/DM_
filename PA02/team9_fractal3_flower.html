@@ -1,0 +1,177 @@
+<html>
+<body>
+
+<input type="text" id="depth" value="">
+<button onclick="doDraw()">Draw</button>
+<button onclick="doClear()">Clear</button>
+<br>
+<canvas id="canvas" width="1000" height="1000"></canvas>
+<script type="text/javascript">
+var elem = document.getElementById('canvas');
+var context = elem.getContext('2d');
+
+var line_width = 9;
+context.fillStyle = "#FFFFFF";
+context.strokeStyle = "rgb(255,20,147)";
+context.lineWidth = line_width;
+context.lineCap = "round";
+context.lineJoin = "round";
+context.shadowBlur;
+var deg_to_rad = Math.PI / 180.0;
+var start_x = 500;
+var start_y = 500;
+
+
+context.lineWidth = 1;
+
+
+var deg_to_rad = Math.PI / 180.0;
+
+var x1=0, y1=0, x2=0, y2=0, x3=0, y3=0, x4=0, y4=0, x5=0, y5=0;
+
+
+function drawpentagon(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, depth_p){
+  context.beginPath();
+  var r = 118, g = 77, b = 116;
+  r = r - 10 * (20- depth_p);
+  g = g - 10 * (20- depth_p);
+  b = b - 10 * (20- depth_p);
+
+  context.strokeStyle = "rgb(" + r + "," + g + "," + b + ")";
+  context.lineWidth = depth_p * 0.4;
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.lineTo(x3, y3);
+  context.lineTo(x4, y4);
+  context.lineTo(x5, y5);
+  context.lineTo(x1, y1);
+  context.stroke();
+  context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+  context.fill();
+  context.closePath();
+}
+
+
+function drawfractal(x1, y1,  x2, y2, x3, y3, x4, y4, x5, y5, depth){
+  if (depth !== 0){
+    depth_p = depth;
+    drawpentagon(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, depth_p);
+    var x_1 = (3*x1+ x2 )/4;
+    var y_1 =( 3*y1+y2)/4;
+    context.moveTo(x_1, y_1); 
+    var x_2 = (3*x2+ x3 )/4;
+    var y_2 = ( 3*y2+y3)/4;
+    var x_3 =( 3*x3+x4)/4;
+    var y_3 = ( 3*y3+y4)/4;
+    var x_4 = ( 3*x4+x5)/4;
+    var y_4 = ( 3*y4+y5)/4;
+    var x_5 = ( 3*x5+x1)/4;
+    var y_5 = ( 3*y5+y1)/4;
+
+    drawfractal(x_1, y_1,  x_2, y_2, x_3, y_3, x_4, y_4, x_5, y_5, depth-1);
+  }
+}
+
+
+function dist(x1,y1,x2,y2) { 
+	x2-=x1; y2-=y1; 
+	return Math.sqrt((x2*x2) + (y2*y2)); 
+}
+
+function drawLine(x1, y1, x2, y2){
+  context.beginPath();
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.stroke();
+  context.closePath();
+}
+
+function drawFractal2(x1, y1, angle, depth, color2){
+  if (depth !== 0){
+    var x2 = x1 + (Math.cos(angle * deg_to_rad) * depth * 3.0);
+    var y2 = y1 + (Math.sin(angle * deg_to_rad) * depth * 3.0);
+    var l = Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2)) * 0.04 * depth;
+    drawLine(x1, y1, x2, y2, depth);
+
+    var x3 = x1 + Math.cos(angle * deg_to_rad) * depth * 1.5;
+    var y3 = y1 + Math.sin(angle * deg_to_rad) * depth * 1.5;
+    var x4 = x3 + Math.cos((angle-90) * deg_to_rad) * depth * 1.5;
+    var y4 = y3 + Math.sin((angle-90) * deg_to_rad) * depth * 1.5;
+    
+    context.beginPath();
+    context.arc(x4, y4, l , 0, Math.PI * 2, true);
+    context.fillStyle = color2
+    context.fill();
+    context.stroke();
+    context.closePath();
+    drawFractal2(x2, y2, angle - 20, depth -1, color2);
+  }
+}
+
+
+function doDraw(){
+  //document.bgColor = "#000000";
+  var depth = 1 * parseInt(document.getElementById("depth").value) ;
+  var length;
+  var depth_log = Math.round(2*Math.log(depth)) + 2;
+  var angle = 360 / depth_log;
+
+  length = 70;
+  context.strokeStyle = "#FFCC66";
+  var out_angle = 20
+  var r = 167, g = 36, b = 160;
+  for(var i = 1; i <= depth_log; i++) {
+    context.lineWidth = depth * 0.3;
+    b += 15;
+    context.strokeStyle = "rgb(" + r + "," + g + "," + b + ")";
+    var color2 = "rgb(" + r + "," + g + "," + b + ")";
+    console.log(i);
+    console.log(color2);
+    drawFractal2(start_x, start_y, angle * i, depth, color2);
+  }
+  
+
+  var numberOfSides = 5;
+  var radius=110;
+  var x = 500;
+  var y = 500;
+
+  var arrayx = new Array();		
+  var arrayy = new Array();
+  var angle = 2*Math.PI/numberOfSides;
+  arrayx[0]= x + radius*Math.cos(Math.PI/2+angle*2);
+  arrayy[0]= x - radius*Math.sin(Math.PI/2+angle*2) ;
+                            
+  for (var i = 1; i < numberOfSides; i++) {
+    arrayx[i]= x + radius*Math.cos(Math.PI/2+angle*2+angle*i) ;
+    arrayy[i]= x - radius*Math.sin(Math.PI/2+angle*2+angle*i);
+    }
+ 	   
+  x1=arrayx[0]; y1=arrayy[0];
+  x2=arrayx[1]; y2=arrayy[1];
+  x3=arrayx[2]; y3=arrayy[2];
+  x4=arrayx[3]; y4=arrayy[3];
+  x5=arrayx[4]; y5=arrayy[4];
+  context.beginPath();
+  context.arc(500, 500, radius, 0, Math.PI * 2, true);
+  context.fillStyle =  "rgb(118,77,116)";
+  context.fill();
+  context.lineWidth=depth*0.6;
+  context.strokeStyle = "rgb(118,77,116)";
+  context.stroke();
+  context.closePath();
+  drawfractal(x1, y1,  x2, y2, x3, y3, x4, y4, x5, y5, depth );
+  
+  
+  
+
+}     
+
+function doClear() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+</script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-// Kakurasu Solver ver 3.2
+// Kakurasu Solver ver 3.3
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,10 +14,9 @@ FILE *stream;
 void LoadData(char* argument, int* data);
 void ConstructSolution(int* data);
 void ConvertData(int* solution);
+void Z3Solver(void);
+
 void MakeOutput(int* solution);
-
-void Z3Solver();
-
 void TestPrint(int* data);
 void TestOutputKaku(int* data);
 void TestOutput(int *solution);
@@ -51,7 +50,7 @@ int main(int argc, char* argv[]){
         solution = malloc(sizeof(int)*MAX_SIZE+1);
         solution[MAX_SIZE+1] = 0;
         
-        Z3Solver(solution);
+        Z3Solver();
         //printf("Extracting Result to output file\n");
         ConvertData(solution);
         //printf("Test Print for solution data --- \n");
@@ -136,7 +135,7 @@ void ConstructSolution(int* from_input){
     fprintf(stream, "(check-sat)\n(get-model)\n") ;
 }
 
-void Z3Solver(){
+void Z3Solver(void){
   
     system("z3 formula_kakurasu.txt >> result_kakurasu.txt");
   
@@ -145,14 +144,9 @@ void Z3Solver(){
 
 void LoadData(char* argument, int* data){
     int i;
-    int box;
-    
-    //box = malloc(sizeof(char)*2);
-    
     if((stream = fopen(argument, "r")) != NULL){
         for(i = 1; i <= KAKU_SIZE ; i++){
-            fscanf(stream, "%d", &box);
-            data[i] = box;
+            fscanf(stream, "%d", &data[i]);
         }
         data[i] = 0;
     }
@@ -160,7 +154,6 @@ void LoadData(char* argument, int* data){
         perror("Error: input FILE");
     }
     
-    //free(box);
     
 }
 

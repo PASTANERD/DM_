@@ -1,0 +1,80 @@
+<html>
+<body>
+
+<input type="text" id="depth" value="">
+<button onclick="doDraw()">Draw</button>
+<button onclick="doClear()">Clear</button>
+<br>
+<canvas id="canvas" width="700" height="600"></canvas>
+
+<script type="text/javascript">
+var elem = document.getElementById('canvas');
+var context = elem.getContext('2d');
+
+context.fillStyle = '#000000';
+context.lineWidth = 1;
+
+var deg_to_rad = Math.PI / 180.0;
+
+function dist(x1,y1,x2,y2) { 
+	x2-=x1; y2-=y1; 
+	return Math.sqrt((x2*x2) + (y2*y2)); 
+}
+
+function drawSquare(x1, y1, x2, y2, x3, y3, x4, y4){
+  context.beginPath();
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.lineTo(x4, y4);
+  context.lineTo(x3, y3);
+  context.lineTo(x1, y1);
+  context.stroke();
+  context.closePath();
+}
+
+function drawFractal2(x1, y1, x2, y2, angle, depth){
+  if (depth !== 0){
+    var bigSide = Math.sqrt(3) / 2 * dist(x1,y1,x2,y2);
+    var Sbr_x = bigSide * Math.cos((angle-30) * deg_to_rad) + x1;
+    var Sbr_y = bigSide * Math.sin((angle-30) * deg_to_rad) + y1;
+    var Stl_x = bigSide * Math.cos((angle-120) * deg_to_rad) + x1;
+    var Stl_y = bigSide * Math.sin((angle-120) * deg_to_rad) + y1;
+    var Str_x = bigSide * Math.cos((angle-120) * deg_to_rad) + Sbr_x;
+    var Str_y = bigSide * Math.sin((angle-120) * deg_to_rad) + Sbr_y;
+    drawSquare(x1, y1, Sbr_x, Sbr_y, Stl_x, Stl_y, Str_x, Str_y);
+
+    var smallSide = dist(x1,y1,x2,y2) / 2;
+    var sbl_x = Sbr_x;
+    var sbl_y = Sbr_y;
+    var stl_x = smallSide * Math.cos((angle -30) * deg_to_rad) + sbl_x;
+    var stl_y = smallSide * Math.sin((angle -30) * deg_to_rad) + sbl_y;
+    var str_x = smallSide * Math.cos((angle -30) * deg_to_rad) + x2;
+    var str_y = smallSide * Math.sin((angle -30) * deg_to_rad) + y2;
+    drawSquare(sbl_x, sbl_y, x2, y2, stl_x, stl_y, str_x, str_y)
+
+    drawFractal2(Stl_x, Stl_y, Str_x, Str_y, angle -30, depth -1);
+    drawFractal2(stl_x, stl_y, str_x, str_y, angle +60, depth -1);
+  }
+}
+
+function doDraw(){
+  var depth = parseInt(document.getElementById("depth").value) ;
+  context.beginPath();
+  context.moveTo(500,500);
+  context.lineTo(400,500);
+  context.lineTo(400,400);
+  context.lineTo(500,400);
+  context.lineTo(500,500);
+  context.closePath();
+  context.stroke();
+  drawFractal2(400,400,500,400, 0, depth);
+} 
+
+function doClear() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+</script>
+
+</body>
+</html>

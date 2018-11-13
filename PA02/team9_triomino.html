@@ -1,0 +1,221 @@
+<html>
+<body>
+
+<input type="text" id="depth" value="">
+<button onclick="doDraw()">Draw</button>
+<button onclick="doClear()">Clear</button>
+<br>
+<br>
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+var elem = document.getElementById('canvas');
+var context = elem.getContext('2d');
+var trioA = '#FF0000';
+var trioB = '#FFFF00';
+var trioC = '#0000FF';
+var trioD = '#00FF00';
+var trioE = '#FF00FF';
+var trioF = '#C9B2F6';
+var trioG = '#00FFFF';
+var trioH = '#009473';
+var trioX = '#FFFFFF';
+
+function initTriomino(x1, y1, length, depth){
+    var next_depth = depth-1;
+    var half_length = length/2;
+    var x2 = x1 + half_length;
+    var y2 = y1 + half_length;
+    var x3 = x1 + half_length/2;
+    var y3 = y1 + half_length/2;
+
+     if(next_depth !== 1){
+         // Divide to three different triomino
+    	findTriominoA(x1, y1, half_length, next_depth);
+        findTriominoB(x2, y1, half_length, next_depth);
+        findTriominoC(x1, y2, half_length, next_depth);
+        findTriominoD(x2, y2, half_length, next_depth);
+        initTriomino(x3, y3, half_length, next_depth); // center grid
+    }
+    else findTriominoA(x1, y1, length, depth);
+}
+
+function findTriominoA(x1, y1, length, depth){
+    var next_depth = depth-1;
+    var half_length = length/2;
+    var x2 = x1 + half_length;
+    var y2 = y1 + half_length;
+    var x3 = x1 + half_length/2;
+    var y3 = y1 + half_length/2;
+
+     if(next_depth !== 1){
+         // Divide to three different triomino
+    	findTriominoA(x1, y1, half_length, next_depth);
+        findTriominoB(x2, y1, half_length, next_depth);
+        findTriominoC(x1, y2, half_length, next_depth);
+        findTriominoA(x3, y3, half_length, next_depth); // center grid
+    }
+
+    else{
+        var color_choose = x1/half_length;
+        
+        context.beginPath();
+        // fill trinomio A
+        if((color_choose%2) != "1") context.fillStyle = trioA;
+        else context.fillStyle = trioE;
+        context.fillRect(x1, y1, half_length, half_length);
+        context.fillRect(x2, y1, half_length, half_length);
+        context.fillRect(x1, y2, half_length, half_length);
+        // blank block 
+        context.fillStyle = trioX;
+        context.fillRect(x2, y2, half_length, half_length);
+
+        // make grid line
+        context.rect(x1, y1, half_length, half_length);
+        context.rect(x2, y1, half_length, half_length);
+        context.rect(x1, y2, half_length, half_length);
+        context.rect(x2, y2, half_length, half_length);
+        context.stroke();
+        context.closePath();
+    }
+}
+
+function findTriominoB(x1, y1, length, depth){
+    var next_depth = depth-1;
+    var half_length = length/2;
+    var x2 = x1 + half_length;
+    var y2 = y1 + half_length;
+    var x3 = x1 + half_length/2;
+    var y3 = y1 + half_length/2;
+
+     if(next_depth !== 1){
+         // Divide to three different triomino
+    	findTriominoA(x1, y1, half_length, next_depth);
+        findTriominoB(x2, y1, half_length, next_depth);
+        findTriominoD(x2, y2, half_length, next_depth);
+        findTriominoB(x3, y3, half_length, next_depth);
+    }
+    else{
+        var color_choose = x1/half_length;
+        context.beginPath();
+
+        // fill trinomio B
+        if((color_choose%2) != "1") context.fillStyle = trioB;
+        else context.fillStyle = trioF;
+        context.fillRect(x1, y1, half_length, half_length);
+        context.fillRect(x2, y1, half_length, half_length);
+        context.fillRect(x2, y2, half_length, half_length);
+        // blank block 
+        context.fillStyle = trioX;
+        context.fillRect(x1, y2, half_length, half_length);
+
+        // make grid line
+        context.rect(x1, y1, half_length, half_length);
+        context.rect(x2, y1, half_length, half_length);
+        context.rect(x1, y2, half_length, half_length);
+        context.rect(x2, y2, half_length, half_length);
+        context.stroke();
+        context.closePath();
+    }
+}
+
+function findTriominoC(x1, y1, length, depth){
+    var next_depth = depth-1;
+    var half_length = length/2;
+    var x2 = x1 + half_length;
+    var y2 = y1 + half_length;
+    var x3 = x1 + half_length/2;
+    var y3 = y1 + half_length/2;
+
+
+     if(next_depth !== 1){
+         // Divide to three different triomino
+    	findTriominoA(x1, y1, half_length, next_depth);
+        findTriominoC(x1, y2, half_length, next_depth);
+        findTriominoD(x2, y2, half_length, next_depth);
+        findTriominoC(x3, y3, half_length, next_depth);
+
+    }
+    else{
+        var color_choose = x1/half_length;
+        context.beginPath();
+
+        // fill trinomio C
+        if((color_choose%2) != "1") context.fillStyle = trioC;
+        else context.fillStyle = trioG;
+        context.fillRect(x1, y1, half_length, half_length);
+        context.fillRect(x1, y2, half_length, half_length);
+        context.fillRect(x2, y2, half_length, half_length);
+        // blank block 
+        context.fillStyle = trioX;
+        context.fillRect(x2, y1, half_length, half_length);
+        
+        // make grid line
+        context.rect(x1, y1, half_length, half_length);
+        context.rect(x2, y1, half_length, half_length);
+        context.rect(x1, y2, half_length, half_length);
+        context.rect(x2, y2, half_length, half_length);
+        context.stroke();
+        context.closePath();
+    }
+}
+
+function findTriominoD(x1, y1, length, depth){
+    var next_depth = depth-1;
+    var half_length = length/2;
+    var x2 = x1 + half_length;
+    var y2 = y1 + half_length;
+    var x3 = x1 + half_length/2;
+    var y3 = y1 + half_length/2;
+
+
+     if(next_depth !== 1){
+         // Divide to three different triomino
+        findTriominoB(x2, y1, half_length, next_depth);
+        findTriominoC(x1, y2, half_length, next_depth);
+        findTriominoD(x2, y2, half_length, next_depth);
+        findTriominoD(x3, y3, half_length, next_depth);
+        
+    }
+    else{
+        var color_choose = x1/half_length;
+        context.beginPath();
+
+        // fill trinomio D
+        if((color_choose%2) != "1") context.fillStyle = trioD;
+        else context.fillStyle = trioH;
+        context.fillRect(x2, y1, half_length, half_length);
+        context.fillRect(x1, y2, half_length, half_length);
+        context.fillRect(x2, y2, half_length, half_length);
+        // blank block 
+        context.fillStyle = trioX;
+        context.fillRect(x1, y1, half_length, half_length);
+    
+        // make grid line
+        context.rect(x1, y1, half_length, half_length);
+        context.rect(x2, y1, half_length, half_length);
+        context.rect(x1, y2, half_length, half_length);
+        context.rect(x2, y2, half_length, half_length);
+        context.stroke();
+        context.closePath();
+    }
+}
+
+
+function doDraw(){
+  var depth = parseInt(document.getElementById("depth").value)+1;
+  var x_init = 0;
+  var y_init = 0;
+  var length_init = 512;
+  
+  initTriomino(x_init, y_init, length_init, depth);
+} 
+
+function doClear() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+</script>
+
+</body>
+</html>

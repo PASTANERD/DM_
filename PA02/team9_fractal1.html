@@ -1,0 +1,68 @@
+<html>
+<body>
+
+<input type="text" id="depth" value="">
+<button onclick="doDraw()">Draw</button>
+<button onclick="doClear()">Clear</button>
+<br>
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+var elem = document.getElementById('canvas');
+var context = elem.getContext('2d');
+
+context.fillStyle = '#000000';
+context.lineWidth = 1;
+
+var deg_to_rad = Math.PI / 180.0;
+
+function dist(x1,y1,x2,y2) { 
+	x2-=x1; y2-=y1; 
+	return Math.sqrt((x2*x2) + (y2*y2)); 
+}
+
+function connectCoordinates(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5){
+  context.beginPath();
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.lineTo(x3, y3);
+  context.lineTo(x4, y4);
+  context.lineTo(x5, y5);
+  context.stroke();
+  context.closePath();
+}
+
+function drawSnowFlake(x1, y1, x2, y2, angle, depth){
+  if (depth !== 0){
+    var x_1 = (x2 - x1)/3 + x1;
+    var y_1 = (y2 - y1)/3 + y1;
+    var x_3 = 2 * (x2 - x1)/3 + x1;
+    var y_3 = 2 * (y2 - y1)/3 + y1;
+    var x_2 = x_1 + dist(x_3,y_3,x_1,y_1) * Math.sin((angle + 30) * deg_to_rad);
+    var y_2 = y_1 + dist(x_3,y_3,x_1,y_1) * Math.cos((angle + 30) * deg_to_rad);
+    if (depth == 1){
+      connectCoordinates(x1, y1, x_1, y_1, x_2, y_2, x_3, y_3, x2, y2);
+    }
+    drawSnowFlake(x1, y1, x_1, y_1, angle, depth -1);
+    drawSnowFlake(x_1, y_1, x_2, y_2, angle - 60, depth -1);
+    drawSnowFlake(x_2, y_2, x_3, y_3, angle + 60, depth -1);
+    drawSnowFlake(x_3, y_3, x2, y2, angle, depth -1);
+  }
+}
+
+function doDraw(){
+  var x = 450 - Math.sqrt(3)*200;
+  var depth = parseInt(document.getElementById("depth").value) ;
+  drawSnowFlake(100, 450, 500, 450, 0, depth);
+  drawSnowFlake(500, 450, 300, x, 120, depth);
+  drawSnowFlake(300, x, 100, 450, -120, depth);
+}
+
+function doClear() {
+  context.clearRect(0, 0, canvas.width, canvas.height) ;
+}
+
+</script>
+
+</body>
+</html>

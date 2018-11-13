@@ -1,4 +1,4 @@
-// Sudoku Solver ver 3.1
+// Sudoku Solver ver 3.2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,10 +13,9 @@ FILE *stream;
 void LoadData(char* argument, int* data);
 void ConstructSolution(int* data);
 void ConvertData(int* solution);
+void Z3Solver(void);
+
 void MakeOutput(int* solution);
-
-void Z3Solver(int* solution);
-
 void TestPrint(int* data);
 void TestOutput(int *solution);
 
@@ -49,7 +48,7 @@ int main(int argc, char* argv[]){
         solution = malloc(sizeof(int)*MAX_SIZE+1);
         solution[MAX_SIZE+1] = 0;
         
-        Z3Solver(solution);
+        Z3Solver();
         //printf("Extracting Result to output file\n");
         ConvertData(solution);
         //printf("Test Print for solution data --- \n");
@@ -170,7 +169,7 @@ void ConstructSolution(int* from_input){
     
 }
 
-void Z3Solver(int* solution){
+void Z3Solver(void){
     system("z3 formula_sudoku.txt >> result_sudoku.txt");
 }
 
@@ -278,19 +277,6 @@ void MakeOutput(int* solution){
             if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT - 1) fprintf(stream, "\n");
         }
         
-        /*
-        for(int i = 0; i < MAX_SIZE ; i++){
-            switch(solution[i]){
-                case 0:
-                    fprintf(stream, "X ");
-                case 1:
-                    fprintf(stream, "O ");
-                default:
-                    if(i%MAX_SIZE_ROOT == MAX_SIZE_ROOT -1) fprintf(stream, "\n\r");
-                    continue;
-            }
-        }
-        */
     }
     
 }
