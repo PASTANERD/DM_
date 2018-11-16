@@ -16,19 +16,20 @@ context.shadowBlur;
 var deg_to_rad = Math.PI / 180.0;
 var start_x = 500;
 var start_y = 500;
-
+var depth;
 var deg_to_rad = Math.PI / 180.0;
 
 var x1=0, y1=0, x2=0, y2=0, x3=0, y3=0, x4=0, y4=0, x5=0, y5=0;
 
 function drawpentagon(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, depth_p){
   context.beginPath();
-  var r = 118, g = 77, b = 116;
-  r = r - 10 * (20- depth_p);
-  g = g - 10 * (20- depth_p);
-  b = b - 10 * (20- depth_p);
+  var r = 158, g = 63, b = 222;
+  r = r - 10 * (depth - depth_p);
+  g = g - 10 * (depth - depth_p);
+  b = b - 10 * (depth - depth_p);
   var color_pent = "rgb(" + r + "," + g + "," + b + ")";
   context.strokeStyle = color_pent;
+  context.fillStyle = color_pent;
   context.lineWidth = depth_p * 0.4;
   context.moveTo(x1, y1);
   context.lineTo(x2, y2);
@@ -37,7 +38,7 @@ function drawpentagon(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, depth_p){
   context.lineTo(x5, y5);
   context.lineTo(x1, y1);
   context.stroke();
-  context.fillStyle = color_pent;
+  
   context.fill();
   context.closePath();
 }
@@ -95,7 +96,7 @@ function drawFractal2(x1, y1, angle, depth, color2){
 
 
 function doDraw(){
-  var depth = 1 * parseInt(document.getElementById("depth").value) ;
+  depth = parseInt(document.getElementById("depth").value) ;
   var depth_log = Math.round(2*Math.log(depth)) + 2;
   var angle = 360 / depth_log;
 
@@ -130,11 +131,13 @@ function doDraw(){
   x4=arrayx[3]; y4=arrayy[3];
   x5=arrayx[4]; y5=arrayy[4];
   context.beginPath();
+  context.fillStyle =  "rgb(168, 73, 232)";
+  context.strokeStyle =  "rgb(168, 73, 232)";
+  
   context.arc(start_x, start_y, radius, 0, Math.PI * 2, true);
-  context.fillStyle =  "rgb(118,77,116)";
   context.fill();
   context.lineWidth=depth*0.6;
-  context.strokeStyle = "rgb(118,77,116)";
+  
   context.stroke();
   context.closePath();
   drawfractal(x1, y1,  x2, y2, x3, y3, x4, y4, x5, y5, depth );
